@@ -10,10 +10,10 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+          stage('Checkout') {
             steps {
-                git 'https://github.com/ayazap/register-app.git'
-            }
+                checkout scm
+            }
         }
 
         stage('Build Docker Image') {
