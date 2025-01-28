@@ -9,12 +9,11 @@ pipeline {
         SSH_CREDENTIALS = "id_ed25519.pub"
     }
 
-    stages {
-          stage('Checkout') {
+        stages {
+        stage('Checkout') {
             steps {
-                checkout scm
-            }
-          }
+               Checkout scm
+            }
         }
 
         stage('Build Docker Image') {
