@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/ayazap/register-app.git'
+                git ayazap: '19G21A04H9@a', branch: 'main', url: 'https://github.com/ayazap/register-app.git'
             }
         }
 
