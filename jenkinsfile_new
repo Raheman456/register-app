@@ -19,7 +19,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${tomcat-new}:${LATEST} ."
+                    sh "docker build -t $tomcat-new:${LATEST} ."
                 }
             }
         }
@@ -28,7 +28,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry([ayaz4:123456789, url: '']) {
-                        sh "docker push ${tomcat-new}:${LATEST}"
+                        sh "docker push $tomcat-new:${LATEST}"
                     }
                 }
             }
@@ -40,10 +40,10 @@ pipeline {
                     sshagent(id_ed25519.pub) {
                         sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@${54.169.164.97} <<EOF
-                        docker pull ${tomcat-new}:${LATEST}
+                        docker pull $tomcat-new:${LATEST}
                         docker stop my-app || true
                         docker rm my-app || true
-                        docker run -d --name my-app -p 80:80 ${tomcat-new}:${LATEST}
+                        docker run -d --name my-app -p 80:80 $tomcat-new:${LATEST}
                         EOF
                         """
                     }
