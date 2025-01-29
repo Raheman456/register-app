@@ -5,7 +5,8 @@ pipeline {
         DOCKER_IMAGE = "ayaz4/tomcat_new"
         DOCKER_TAG = "LATEST"
         DOCKER_CREDENTIALS = "123456789"
-        DEPLOY_SERVER = "3.0.102.103 "
+        DEPLOY_SERVER = "3.0.102.103"
+        SSH_CREDENTIALS = "id_ed25519.pub"
     }
 
         stages {
@@ -36,10 +37,13 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 script {
+                    sshagent(id_ed25519.pub) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_SERVER} <<EOF
                         docker pull ${tomcat_new}:${LATEST}
                         docker stop my-app || true
                         docker rm my-app || true
-                        docker run -d --name my-app -p 80:80 ${tomcat_new}:${LATEST}
+                        docker run -d --name my-app -p 80:80 $tomcat_new}:${LATEST}
                         EOF
                         """
                     }
@@ -47,4 +51,5 @@ pipeline {
             }
         }
     }
+}
 
