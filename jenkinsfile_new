@@ -19,10 +19,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t {tomcat-new}:${LATEST}"
+                    sh "docker build -t ${tomcat-new}:${LATEST}"
                 }
-            }
-        }
+           }
 
         stage('Push to Docker Hub') {
             steps {
@@ -39,7 +38,7 @@ pipeline {
                 script {
                     sshagent(id_ed25519.pub) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_SERVER} <<EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@${54.169.164.97} <<EOF
                         docker pull ${tomcat-new}:${LATEST}
                         docker stop my-app || true
                         docker rm my-app || true
