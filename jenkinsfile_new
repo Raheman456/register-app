@@ -38,14 +38,14 @@ pipeline {
             steps {
                 script {
                     sshagent(id_ed25519.pub) {
-                        sh """
+                        sh '''
                         "ssh -o StrictHostKeyChecking=no ubuntu@$54.169.164.97 <<'EOF'"
                         docker pull $tomcat-new:${LATEST}
                         docker stop my-app || true
                         docker rm my-app || true
                         docker run -d --name my-app -p 80:80 $tomcat-new:${LATEST}
                         EOF
-                        """
+                        '''
                     }
                 }
             }
