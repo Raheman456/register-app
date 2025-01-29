@@ -2,53 +2,74 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "ayaz4/tomcat_new"
-        DOCKER_TAG = "LATEST"
-        DOCKER_CREDENTIALS = "123456789"
-        DEPLOY_SERVER = "3.0.91.193"
-        SSH_CREDENTIALS = "id_ed25519.pub"
+        // Define environment variables
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_IMAGE_NAME = 'ayaz4/tomcat-new'
+        DOCKER_IMAGE_TAG = 'LATEST'
     }
 
-        stages {
+    stages {
         stage('Checkout') {
             steps {
-               checkout scm
+                // Checkout the code from the repository
+                checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${tomcat_new}:${LATEST} ."
+                    // Build the Docker image
+                    docker.build("${tomcat-new}:${LATEST}")
                 }
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Run Tests') {
             steps {
                 script {
-                    withDockerRegistry([ayaz4:123456789, url: '']) {
-                        sh "docker push ${tomcat_new}:${LATEST}"
+                    // Run tests inside the Docker container
+                    docker.image("${tomcat-new}:${LATEST}").inside {
+                        sh 'yum test' // Replace with your test command
                     }
                 }
             }
         }
 
-        stage('Deploy to Server') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    sshagent(id_ed25519.pub) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_SERVER} <<EOF
-                        docker pull ${tomcat_new}:${LATEST}
-                        docker stop my-app || true
-                        docker rm my-app || true
-                        docker run -d --name my-app -p 80:80 $tomcat_new}:${LATEST}
-                        EOF
-                        """
+                    // Log in to Docker Hub (or another registry)
+                    withCredentials([usernamePassword(credentialsId: 'ayaz4', usernameVariable: 'ayaz4', passwordVariable: '123456789')]) {
+                        sh "echo ${123456789} | docker login -u ${ayaz4} --password-stdin ${DOCKER_REGISTRY}"
+                    }
+
+                    // Push the Docker image to the registry
+                    docker.withRegistry("https://${DOCKER_REGISTRY}", 'docker-hub-creds') {
+                        docker.image("${tomcat-new}:${LATEST}").push()
                     }
                 }
             }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Optional: Add deployment steps here
+                    echo 'Deploying application...'
+                    // Example: SSH into a server and pull the new image
+                    // sh 'ssh user@server "docker pull ${tomcat-new}:${LATEST} && docker-compose up -d"'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
